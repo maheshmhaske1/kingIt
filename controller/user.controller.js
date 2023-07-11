@@ -530,7 +530,7 @@ exports.sendGift = async (req, res) => {
     .findOneAndUpdate(
       { _id: mongoose.Types.ObjectId(receiver) },
       {
-        $set: { coin: reciver_coin },
+        $set: { LiveEarningcoin: reciver_coin },
       }
     )
     .then((success) => {
