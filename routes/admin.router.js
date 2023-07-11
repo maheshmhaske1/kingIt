@@ -28,6 +28,7 @@ router.post('/ad/get/:status', admin.getAds)
 router.delete('/ad/delete/:adId', admin.deleteAd)
 router.put('/ad/update', admin.updateAd)
 router.get('/user/getByCountry', admin.getUserByCountry)
+router.get('/user/getBannedUsers', admin.getBanUser)
 
 
 
@@ -36,7 +37,7 @@ router.post('/salary', admin.createSalary);
 
 
 // API routes for gifts
-router.post('/ad/gifts',admin.createGift);
+router.post('/ad/gifts', admin.createGift);
 
 
 //Banner

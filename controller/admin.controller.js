@@ -622,8 +622,6 @@ exports.createSalary = async (req, res) => {
   }
 };
 
-
-
 exports.createBanner = async (req, res) => {
   const { title, image, coin, status, action } = req.body;
 
@@ -651,3 +649,20 @@ exports.createBanner = async (req, res) => {
     });
   }
 };
+
+exports.getBanUser = async (req, res) => {
+  await userModel.find({ isBlocked: true })
+    .then(success => {
+      return res.json({
+        status: true,
+        message: "user blocklist list",
+        data:success
+      })
+    })
+    .catch(error => {
+      return res.json({
+        status: false,
+        message: "error"
+      })
+    })
+}
