@@ -129,6 +129,25 @@ exports.login = async (req, res) => {
   }
 };
 
+exports.getUserById = async (req, res) => {
+  const { id } = req.params
+
+  await userModel.findOne({ id: id })
+    .then((success) => {
+      return res.json({
+        success: true,
+        message: "user details",
+        data: success,
+      });
+    })
+    .catch((error) => {
+      return res.json({
+        success: false,
+        message: "something went wrong",
+      });
+    });
+}
+
 exports.sendOtp = async (req, res) => {
   const { mobile } = req.params;
 

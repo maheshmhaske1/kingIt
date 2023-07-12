@@ -15,6 +15,7 @@ router.post("/create", userController.createUser);
 router.post("/login", userController.login);
 router.get("/get/:userId", userController.getUser);
 router.delete("/delete/:userId", userController.deleteUser);
+router.get("/getbyid/:id", userController.getUserById);
 router.put("/update/:userId", userController.update);
 router.post("/images/remove", userController.remove_profile_img);
 router.get("/getAll", userController.getAll);
