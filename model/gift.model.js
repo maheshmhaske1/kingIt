@@ -2,8 +2,7 @@ const mongoose = require('mongoose');
 
 const giftSchema = new mongoose.Schema({
   category: {
-    type: String,
-    enum: ['lucky', 'popular', 'luxury', 'customize', 'random'],
+    type: String
   },
   name: {
     type: String,
@@ -14,14 +13,11 @@ const giftSchema = new mongoose.Schema({
   image: {
     type: String,
   },
-  thumbnail: {
-    type: String,
+  createdBy: {
+    type: mongoose.Types.ObjectId,
   },
-  sound: {
-    type: String,
-  }
 });
 
-const Gift = mongoose.model('Gift', giftSchema);
+const Gift = mongoose.model('Gifts', giftSchema);
 
 module.exports = Gift;

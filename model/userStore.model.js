@@ -14,6 +14,10 @@ const userStoreSchema = new mongoose.Schema({
   validTill: {
     type: Date,
   },
+  
+  createdBy: {
+    type: mongoose.Types.ObjectId,
+  },
 });
 
 var userStoreModel = mongoose.model("userStoreItems", userStoreSchema);

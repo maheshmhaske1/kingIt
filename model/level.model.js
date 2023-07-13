@@ -7,6 +7,9 @@ const levelSchema = new mongoose.Schema({
   requirement: {
     type: String,
   },
+  createdBy: {
+    type: mongoose.Types.ObjectId,
+  },
 });
 
 var levelModel = mongoose.model("levels", levelSchema);

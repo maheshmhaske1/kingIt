@@ -7,6 +7,9 @@ const rechargeHistorySchema = new mongoose.Schema({
   coinAdded: {
     type: Number,
   },
+  createdBy: {
+    type: mongoose.Types.ObjectId,
+  },
 });
 
 var rechargeHistoryModel = mongoose.model(

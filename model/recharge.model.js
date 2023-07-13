@@ -36,6 +36,9 @@ const rechargeSchema = new mongoose.Schema({
   action: {
     type: String,
   },
+  createdBy: {
+    type: mongoose.Types.ObjectId,
+  },
 });
 
 const Recharge = mongoose.model('Recharge', rechargeSchema);

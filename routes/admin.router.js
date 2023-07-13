@@ -17,6 +17,7 @@ router.post(
 );
 router.get("/getRechargeHistory", authenticate_admin, admin.getRechargeHistory);
 router.post("/add-store", upload_store, admin.addItemStore);
+router.put("/update-store", upload_store, admin.updateStore);
 router.post("/add-levels", upload_store, admin.addLevelMaster);
 router.post("/delete-levels", upload_store, admin.deleteLevelMaster);
 router.get("/get-all-store", admin.getAllStores);
@@ -37,10 +38,16 @@ router.post('/salary', admin.createSalary);
 
 
 // API routes for gifts
-router.post('/ad/gifts', admin.createGift);
+router.post('/gifts/add', upload_store, admin.createGift);
+router.get('/gifts/getAll', upload_store, admin.getAllGifts);
+router.put('/gifts/update/:giftId', upload_store, admin.updateGift);
+router.delete('/gifts/delete/:giftId', admin.deleteGift);
 
 
 //Banner
-router.post('/banner', admin.createBanner);
+router.post('/banner/add', upload_store, admin.createBanner);
+router.get('/banner/getAll', admin.getAllBanners);
+router.put('/banner/update/:bannerId', upload_store, admin.updateBanner);
+router.delete('/banner/delete/:bannerId', admin.deleteBanner);
 
 module.exports = router;

@@ -7,6 +7,9 @@ const levelMasterSchema = new mongoose.Schema({
     coinRequire: {
         type: String,
     },
+    createdBy: {
+        type: mongoose.Types.ObjectId,
+      },
 });
 
 var levelMasterModel = mongoose.model("levelMaster", levelMasterSchema);

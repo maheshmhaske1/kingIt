@@ -154,7 +154,7 @@ exports.updateUser = async (req, res) => {
 };
 
 exports.addItemStore = async (req, res) => {
-  const { price, name, validity, status } = req.body;
+  const { price, name, validity, status,createdBy } = req.body;
 
   console.log(req.file);
   if (!req.file)
@@ -171,12 +171,64 @@ exports.addItemStore = async (req, res) => {
     validity: validity,
     storeUrl: displayPhoto,
     status: status,
+    createdBy:createdBy
   })
     .save()
     .then(async (success) => {
       return res.json({
         status: true,
         message: `store added successfully successfully`,
+        data: success,
+      });
+    })
+    .catch((error) => {
+      return res.json({
+        status: false,
+        message: `error`,
+        error,
+      });
+    });
+};
+
+
+exports.updateStore = async (req, res) => {
+  const { price, name, validity, status, storeId } = req.body;
+
+  if (!storeId) {
+    return res.json({
+      status: false,
+      message: `please provide storeid`,
+    })
+  }
+
+  const store = await storeModel.findById({ _id: storeId })
+  if (!store) {
+    return res.json({
+      status: false,
+      message: `please provide valid storeid`,
+    })
+  }
+  console.log(req.file)
+  let displayPhoto;
+  if (req.file)
+    displayPhoto = req.file.filename;
+  console.log(displayPhoto);
+  await storeModel.findOneAndUpdate({
+    _id: mongoose.Types.ObjectId(storeId)
+  },
+    {
+      $set: {
+        price: price,
+        name: name,
+        validity: validity,
+        storeUrl: displayPhoto,
+        status: status,
+      }
+    })
+    .then(async (success) => {
+      return res.json({
+        status: true,
+        message: `store updated successfully`,
         data: success,
       });
     })
@@ -232,7 +284,7 @@ exports.addDeviceIntoBlock = async (req, res) => {
 };
 
 exports.recharge = async (req, res) => {
-  const { userId, coin } = req.body;
+  const { userId, coin ,createdBy} = req.body;
 
   await userModel
     .findOneAndUpdate(
@@ -246,12 +298,13 @@ exports.recharge = async (req, res) => {
       await new rechargeHistoryModel({
         usrId: userId,
         coinAdded: coin,
+        createdBy:createdBy
       }).save();
       return res.json({
         status: true,
         message: "coin added",
       });
-    })
+  })
     .catch((error) => {
       return res.json({
         status: false,
@@ -288,7 +341,7 @@ exports.getRechargeHistory = async (req, res) => {
 };
 
 exports.addLevel = async (req, res) => {
-  const { price, name, validity, status } = req.body;
+  const { price, name, validity, status,createdBy } = req.body;
 
   console.log(req.file);
   if (!req.file)
@@ -404,7 +457,7 @@ exports.updateSticker = async (req, res) => {
 };
 
 exports.addLevelMaster = async (req, res) => {
-  const { coinRequire } = req.body;
+  const { coinRequire ,createdBy} = req.body;
 
   console.log(req.file);
   if (!req.file)
@@ -416,6 +469,7 @@ exports.addLevelMaster = async (req, res) => {
   const displayPhoto = req.file.filename;
   await new levelMasterModel({
     coinRequire: coinRequire,
+    createdBy:createdBy,
     levelImgUrl: displayPhoto,
   })
     .save()
@@ -573,26 +627,93 @@ const gift = require("../model/gift.model");
 
 // POST /api/gifts
 exports.createGift = async (req, res) => {
-  try {
-    const { category, name, coin, image, thumbnail, sound } = req.body;
+  const { category, name, coin, createdBy } = req.body;
 
-    const newGift = new gift({
-      category,
-      name,
-      coin,
-      image,
-      thumbnail,
-      sound,
+  if (!req.file)
+    return res.json({
+      status: false,
+      message: `please select image`,
     });
 
-    const createdGift = await newGift.save();
+  const displayPhoto = req.file.filename;
 
-    res.status(201).json({ message: "Created", data: createdGift });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error" });
-  }
+  const newGift = new gift({
+    category: category,
+    name: name,
+    coin: coin,
+    image: displayPhoto,
+    createdBy: createdBy
+  });
+
+  const createdGift = await newGift.save();
+
+  res.status(201).json({ message: "Created", data: createdGift });
 };
+
+
+exports.getAllGifts = async (req, res) => {
+  await gift.find()
+    .then(success => {
+      return res.json({
+        status: true,
+        message: "All gifts",
+        data: success
+      })
+    })
+    .catch(error => {
+      return res.json({
+        status: false,
+        message: "error"
+      })
+    })
+}
+
+exports.updateGift = async (req, res) => {
+  const { giftId } = req.params;
+  const update_data = req.body
+
+  let displayPhoto;
+  if (req.file)
+    displayPhoto = req.file.filename
+
+  await gift.findOneAndUpdate({ _id: mongoose.Types.ObjectId(giftId) },
+    {
+      $set: update_data
+    })
+    .then(success => {
+      return res.json({
+        status: true,
+        message: "gift updated",
+        data: success
+      })
+    })
+    .catch(error => {
+      return res.json({
+        status: false,
+        message: "error"
+      })
+    })
+};
+
+
+exports.deleteGift = async (req, res) => {
+  const { giftId } = req.params
+
+  await gift.findByIdAndDelete({ _id: giftId })
+    .then(success => {
+      return res.json({
+        status: true,
+        message: "gift deleted",
+        data: success
+      })
+    })
+    .catch(error => {
+      return res.json({
+        status: false,
+        message: "error"
+      })
+    })
+}
 
 const salary = require("../model/salary.model");
 
@@ -623,14 +744,23 @@ exports.createSalary = async (req, res) => {
 };
 
 exports.createBanner = async (req, res) => {
-  const { title, image, coin, status, action } = req.body;
+  const { title, coin, status, createdBy } = req.body;
 
   try {
+    if (!req.file)
+      return res.json({
+        status: false,
+        message: `please select image`,
+      });
+
+    const displayPhoto = req.file.filename;
+
     const newBanner = new Banner({
       title: title,
-      image: image,
+      image: displayPhoto,
       coin: coin,
       status: status,
+      createdBy: createdBy
     });
 
     const savedBanner = await newBanner.save();
@@ -650,13 +780,78 @@ exports.createBanner = async (req, res) => {
   }
 };
 
+exports.getAllBanners = async (req, res) => {
+  await Banner.find()
+    .then(success => {
+      return res.json({
+        status: true,
+        message: "All banners",
+        data: success
+      })
+    })
+    .catch(error => {
+      return res.json({
+        status: false,
+        message: "error"
+      })
+    })
+}
+
+exports.updateBanner = async (req, res) => {
+  const { bannerId } = req.params;
+  const update_data = req.body
+
+  let displayPhoto;
+  if (req.file)
+    displayPhoto = req.file.filename
+
+  await Banner.findOneAndUpdate({ _id: mongoose.Types.ObjectId(bannerId) },
+    {
+      $set: update_data
+    })
+    .then(success => {
+      return res.json({
+        status: true,
+        message: "banner updated",
+        data: success
+      })
+    })
+    .catch(error => {
+      return res.json({
+        status: false,
+        message: "error"
+      })
+    })
+};
+
+
+exports.deleteBanner = async (req, res) => {
+  const { bannerId } = req.params
+
+  await Banner.findByIdAndDelete({ _id: bannerId })
+    .then(success => {
+      return res.json({
+        status: true,
+        message: "banner deleted",
+        data: success
+      })
+    })
+    .catch(error => {
+      return res.json({
+        status: false,
+        message: "error"
+      })
+    })
+}
+
+
 exports.getBanUser = async (req, res) => {
   await userModel.find({ isBlocked: true })
     .then(success => {
       return res.json({
         status: true,
         message: "user blocklist list",
-        data:success
+        data: success
       })
     })
     .catch(error => {
