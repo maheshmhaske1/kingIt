@@ -559,7 +559,7 @@ exports.updateAd = async (req, res) => {
   const { AdId, url, status } = req.body;
 
   await adModel
-    .findOneAndDelete(
+    .findOneAndUpdate(
       { _id: mongoose.Types.ObjectId(AdId) },
       {
         $set: { url: url, status: status },
