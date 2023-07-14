@@ -608,6 +608,7 @@ exports.getAllLevel = async (req, res) => {
       });
     });
 }
+
 exports.addAd = async (req, res) => {
   const { url } = req.body;
 
@@ -815,6 +816,7 @@ exports.deleteGift = async (req, res) => {
 }
 
 const salary = require("../model/salary.model");
+const bannedUserModel = require("../model/bannedUsers.model");
 
 exports.createSalary = async (req, res) => {
   const { userId, coins } = req.body;
@@ -945,11 +947,49 @@ exports.deleteBanner = async (req, res) => {
 
 
 exports.getBanUser = async (req, res) => {
-  await userModel.find({ isBlocked: true })
+  await bannedUserModel.aggregate([
+    {
+      $match: {}
+    },
+    {
+      $lookup: {
+        from: "users",
+        foreignField: "_id",
+        localField: "userId",
+        as: "user_info"
+      }
+    },
+    {
+      $lookup: {
+        from: "admins",
+        foreignField: "_id",
+        localField: "createdBy",
+        as: "actionBy"
+      }
+    }
+  ])
     .then(success => {
       return res.json({
         status: true,
-        message: "user blocklist list",
+        message: "banned user",
+        data: success
+      })
+    })
+    .catch(error => {
+      return res.json({
+        status: false,
+        message: "error"
+      })
+    })
+}
+
+exports.unbanUser = async (req, res) => {
+  const { id } = req.params
+  await bannedUserModel.findByIdAndDelete({ _id: id })
+    .then(success => {
+      return res.json({
+        status: true,
+        message: "user unbanned",
         data: success
       })
     })

@@ -44,6 +44,7 @@ router.delete('/ad/delete/:adId', admin.deleteAd)
 router.put('/ad/update', admin.updateAd)
 router.get('/user/getByCountry', admin.getUserByCountry)
 router.get('/user/getBannedUsers', admin.getBanUser)
+router.get('/user/unban/:id', admin.unbanUser)
 
 
 

@@ -50,5 +50,6 @@ router.post("/store/purchase", userController.buyStoreItem);
 router.put("/store/update", userController.updateUserStore);
 
 router.post("/isBannedDevice", userController.isDeviceBanned);
+router.post("/ban", userController.BanUser);
 
 module.exports = router;

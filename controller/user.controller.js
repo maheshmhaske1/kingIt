@@ -13,6 +13,7 @@ const posts = require("../model/post.model");
 const storeModel = require("../model/store.model");
 const userStoreModel = require("../model/userStore.model");
 const bannedDeviceModel = require("../model/bannedDevice.model");
+const bannedUserModel = require("../model/bannedUsers.model");
 
 exports.createUser = async (req, res) => {
   let { name, email, mobile, about, dob, gender, country } = req.body;
@@ -56,7 +57,7 @@ exports.createUser = async (req, res) => {
     about: about,
     gender: gender,
     id: id,
-    country: country
+    country: country,
   })
     .save()
     .then(async (success) => {
@@ -99,7 +100,6 @@ exports.login = async (req, res) => {
 
   const isUserFound = await userModel.findOne({ mobile: mobile });
 
-
   if (!isUserFound) {
     return res.json({
       success: false,
@@ -107,13 +107,25 @@ exports.login = async (req, res) => {
     });
   }
 
-  if (isUserFound.isBlocked == true) {
-    return res.json({
-      success: false,
-      message: "you are blocked",
-    });
+  const isBannedUser = await bannedUserModel.findOne({ userId: mongoose.Types.ObjectId(isUserFound._id) })
+  if (isBannedUser) {
+    if (isBannedUser.isPermenentBan == true) {
+      return res.json({
+        success: false,
+        message: "admin banned this account permanent",
+      });
+    }
+    const givenDate = new Date(isBannedUser.period);
+    const today = new Date();
+    givenDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+    if (givenDate > today) {
+      return res.json({
+        success: false,
+        message: `you will be unban on ${isBannedUser.period}`
+      });
+    }
   }
-
 
   if (otp === 1122) {
     return res.json({
@@ -130,9 +142,10 @@ exports.login = async (req, res) => {
 };
 
 exports.getUserById = async (req, res) => {
-  const { id } = req.params
+  const { id } = req.params;
 
-  await userModel.findOne({ id: id })
+  await userModel
+    .findOne({ id: id })
     .then((success) => {
       return res.json({
         success: true,
@@ -146,7 +159,7 @@ exports.getUserById = async (req, res) => {
         message: "something went wrong",
       });
     });
-}
+};
 
 exports.sendOtp = async (req, res) => {
   const { mobile } = req.params;
@@ -1077,5 +1090,51 @@ exports.isDeviceBanned = async (req, res) => {
   if (!isBannedDevice) {
     return res.json({ status: false, message: "this device is not banned" });
   }
+};
+
+exports.BanUser = async (req, res) => {
+  let { userId, period, createdBy, isPermenentBan } = req.body;
+
+  if (!userId || !period) {
+    return res.json({
+      status: false,
+      message: "please provide user id and period",
+    });
+  }
+
+  const user = await userModel.findById({ _id: userId });
+  if (!user) {
+    return res.json({
+      status: false,
+      message: "please provide valid user id",
+    });
+  }
+
+  let currentDate = new Date();
+  period == 0
+    ? (period = 0)
+    : (period = new Date(currentDate.getTime() + period * 24 * 60 * 60 * 1000));
+
+  await new bannedUserModel({
+    userId: userId,
+    createdBy: createdBy,
+    period: period,
+    isPermenentBan: isPermenentBan
+  })
+    .save()
+    .then(async (success) => {
+      return res.json({
+        status: true,
+        message: `user added in blocklist`,
+        data: success,
+      });
+    })
+    .catch((error) => {
+      return res.json({
+        status: false,
+        message: `error`,
+        error,
+      });
+    });
 };
 
