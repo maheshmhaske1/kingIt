@@ -154,7 +154,7 @@ exports.updateUser = async (req, res) => {
 };
 
 exports.addItemStore = async (req, res) => {
-  const { price, name, validity, status,createdBy } = req.body;
+  const { price, name, validity, status, createdBy } = req.body;
 
   console.log(req.file);
   if (!req.file)
@@ -171,7 +171,7 @@ exports.addItemStore = async (req, res) => {
     validity: validity,
     storeUrl: displayPhoto,
     status: status,
-    createdBy:createdBy
+    createdBy: createdBy
   })
     .save()
     .then(async (success) => {
@@ -284,7 +284,7 @@ exports.addDeviceIntoBlock = async (req, res) => {
 };
 
 exports.recharge = async (req, res) => {
-  const { userId, coin ,createdBy} = req.body;
+  const { userId, coin, createdBy } = req.body;
 
   await userModel
     .findOneAndUpdate(
@@ -298,13 +298,13 @@ exports.recharge = async (req, res) => {
       await new rechargeHistoryModel({
         usrId: userId,
         coinAdded: coin,
-        createdBy:createdBy
+        createdBy: createdBy
       }).save();
       return res.json({
         status: true,
         message: "coin added",
       });
-  })
+    })
     .catch((error) => {
       return res.json({
         status: false,
@@ -341,7 +341,7 @@ exports.getRechargeHistory = async (req, res) => {
 };
 
 exports.addLevel = async (req, res) => {
-  const { price, name, validity, status,createdBy } = req.body;
+  const { price, name, validity, status, createdBy } = req.body;
 
   console.log(req.file);
   if (!req.file)
@@ -434,7 +434,7 @@ exports.updateSticker = async (req, res) => {
   const update_data = req.body;
 
   let displayPhot;
-  if(req.file){
+  if (req.file) {
     displayPhoto = req.file.filename;
   }
 
@@ -462,7 +462,7 @@ exports.updateSticker = async (req, res) => {
 };
 
 exports.addLevelMaster = async (req, res) => {
-  const { coinRequire ,createdBy} = req.body;
+  const { coinRequire, createdBy } = req.body;
 
   console.log(req.file);
   if (!req.file)
@@ -474,7 +474,7 @@ exports.addLevelMaster = async (req, res) => {
   const displayPhoto = req.file.filename;
   await new levelMasterModel({
     coinRequire: coinRequire,
-    createdBy:createdBy,
+    createdBy: createdBy,
     levelImgUrl: displayPhoto,
   })
     .save()
@@ -515,6 +515,23 @@ exports.deleteLevelMaster = async (req, res) => {
     });
 };
 
+exports.getAllLevel = async(req,res)=>{
+  await levelMasterModel.find()
+  .then(async (success) => {
+    return res.json({
+      status: true,
+      message: `All levels`,
+      data: success,
+    });
+  })
+  .catch((error) => {
+    return res.json({
+      status: false,
+      message: `error`,
+      error,
+    });
+  });
+}
 exports.addAd = async (req, res) => {
   const { url } = req.body;
 
