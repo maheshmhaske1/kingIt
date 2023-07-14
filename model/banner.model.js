@@ -1,19 +1,18 @@
 const mongoose = require("mongoose");
 
 const bannerSchema = new mongoose.Schema({
-  title: {
+  name: {
     type: String,
   },
   image: {
     type: String,
   },
-  coin: {
-    type: Number,
+  whatsapp: {
+    type: String,
   },
-  status: {
+  link: {
     type: String
   },
-
   createdBy: {
     type: mongoose.Types.ObjectId,
   },

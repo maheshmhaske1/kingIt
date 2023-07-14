@@ -270,7 +270,7 @@ exports.addDeviceIntoBlock = async (req, res) => {
     .then(async (success) => {
       return res.json({
         status: true,
-        message: `device added into blocklist`,
+        message: ` all banned devices`,
         data: success,
       });
     })
@@ -282,6 +282,44 @@ exports.addDeviceIntoBlock = async (req, res) => {
       });
     });
 };
+
+exports.deleteFromBannedDevice = async (req, res) => {
+  const { deviceId } = req.body
+
+  await bannedDeviceModel.findOneAndDelete({ bannedDevice: deviceId })
+    .then(async (success) => {
+      return res.json({
+        status: true,
+        message: `removed`,
+        data: success,
+      });
+    })
+    .catch((error) => {
+      return res.json({
+        status: false,
+        message: `error`,
+        error,
+      });
+    });
+}
+exports.getAllBannedDevice = async (req, res) => {
+  await bannedDeviceModel.find()
+    .then(async (success) => {
+      return res.json({
+        status: true,
+        message: `device added into blocklist`,
+        data: success,
+      });
+    })
+    .catch((error) => {
+      return res.json({
+        status: false,
+        message: `error`,
+        error,
+      });
+    });
+}
+
 
 exports.recharge = async (req, res) => {
   const { userId, coin, createdBy } = req.body;
@@ -494,6 +532,44 @@ exports.addLevelMaster = async (req, res) => {
     });
 };
 
+exports.updateLevelMaster = async (req, res) => {
+  const { coinRequire, createdBy, levelId } = req.body;
+
+  console.log(req.file);
+  if (!req.file)
+    return res.json({
+      status: false,
+      message: `please select image`,
+    });
+
+  let displayPhoto;
+  if (req.file)
+    displayPhoto = req.file.filename;
+  await levelMasterModel.findByIdAndUpdate({ _id: levelId },
+    {
+      $set: {
+        coinRequire: coinRequire,
+        createdBy: createdBy,
+        levelImgUrl: displayPhoto,
+      }
+    }
+  )
+    .then(async (success) => {
+      return res.json({
+        status: true,
+        message: `level updated successfully`,
+        data: success,
+      });
+    })
+    .catch((error) => {
+      return res.json({
+        status: false,
+        message: `error`,
+        error,
+      });
+    });
+};
+
 exports.deleteLevelMaster = async (req, res) => {
   const { levelId } = req.body;
 
@@ -515,22 +591,22 @@ exports.deleteLevelMaster = async (req, res) => {
     });
 };
 
-exports.getAllLevel = async(req,res)=>{
+exports.getAllLevel = async (req, res) => {
   await levelMasterModel.find()
-  .then(async (success) => {
-    return res.json({
-      status: true,
-      message: `All levels`,
-      data: success,
+    .then(async (success) => {
+      return res.json({
+        status: true,
+        message: `All levels`,
+        data: success,
+      });
+    })
+    .catch((error) => {
+      return res.json({
+        status: false,
+        message: `error`,
+        error,
+      });
     });
-  })
-  .catch((error) => {
-    return res.json({
-      status: false,
-      message: `error`,
-      error,
-    });
-  });
 }
 exports.addAd = async (req, res) => {
   const { url } = req.body;
@@ -649,7 +725,7 @@ const gift = require("../model/gift.model");
 
 // POST /api/gifts
 exports.createGift = async (req, res) => {
-  const { category, name, coin, createdBy } = req.body;
+  const { category, name, coin, createdBy, vat } = req.body;
 
   if (!req.file)
     return res.json({
@@ -664,7 +740,8 @@ exports.createGift = async (req, res) => {
     name: name,
     coin: coin,
     image: displayPhoto,
-    createdBy: createdBy
+    createdBy: createdBy,
+    vat: vat
   });
 
   const createdGift = await newGift.save();
@@ -766,7 +843,7 @@ exports.createSalary = async (req, res) => {
 };
 
 exports.createBanner = async (req, res) => {
-  const { title, coin, status, createdBy } = req.body;
+  const { name, whatsapp, link, createdBy } = req.body;
 
   try {
     if (!req.file)
@@ -778,10 +855,10 @@ exports.createBanner = async (req, res) => {
     const displayPhoto = req.file.filename;
 
     const newBanner = new Banner({
-      title: title,
+      name: name,
       image: displayPhoto,
-      coin: coin,
-      status: status,
+      whatsapp: whatsapp,
+      link: link,
       createdBy: createdBy
     });
 

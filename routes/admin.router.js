@@ -15,10 +15,23 @@ router.post(
   authenticate_admin,
   admin.addDeviceIntoBlock
 );
+router.get(
+  "/getAllDeviceInBlockList",
+  authenticate_admin,
+  admin.getAllBannedDevice
+);
+router.delete(
+  "/deleteDeviceInBlockList",
+  authenticate_admin,
+  admin.deleteFromBannedDevice
+);
+
+
 router.get("/getRechargeHistory", authenticate_admin, admin.getRechargeHistory);
 router.post("/add-store", upload_store, admin.addItemStore);
 router.put("/update-store", upload_store, admin.updateStore);
 router.post("/add-levels", upload_store, admin.addLevelMaster);
+router.put("/update-levels", upload_store, admin.updateLevelMaster);
 router.get("/getAll-levels", admin.getAllLevel);
 router.post("/delete-levels", upload_store, admin.deleteLevelMaster);
 router.get("/get-all-store", admin.getAllStores);

@@ -7,6 +7,9 @@ const giftSchema = new mongoose.Schema({
   name: {
     type: String,
   },
+  vat: {
+    type: String,
+  },
   coin: {
     type: Number,
   },
