@@ -433,6 +433,11 @@ exports.updateSticker = async (req, res) => {
   const { stickerId } = req.params;
   const update_data = req.body;
 
+  let displayPhot;
+  if(req.file){
+    displayPhoto = req.file.filename;
+  }
+
   await stickerModel
     .findOneAndUpdate(
       { _id: mongoose.Types.ObjectId(stickerId) },
