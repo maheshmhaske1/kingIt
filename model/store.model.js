@@ -18,6 +18,9 @@ const storeSchema = new mongoose.Schema({
     type: Number,
     default:1
   },
+  createdBy:{
+type:mongoose.Types.ObjectId
+  }
 });
 
 var storeModel = mongoose.model("storeItems", storeSchema);

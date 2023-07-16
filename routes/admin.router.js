@@ -49,7 +49,9 @@ router.get('/user/unban/:id', admin.unbanUser)
 
 
 //Salary 
-router.post('/salary', admin.createSalary);
+router.post('/salary', admin.createSalary); // NOT IN USE
+router.post('/clear-salary', admin.clearUserSalary)
+router.get('/get-salary-history', admin.getSalaryHistory)
 
 
 // API routes for gifts

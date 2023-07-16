@@ -8,6 +8,9 @@ const adSchema = new mongoose.Schema({
   status: {
     type: Number,
     default: 1,
+  },
+  createdBy:{
+    type:mongoose.Types.ObjectId
   }
 });
 

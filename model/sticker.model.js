@@ -7,8 +7,11 @@ const stickerSchema = new mongoose.Schema({
   url: {
     type: String,
   },
-  status:{
-    type:Number
+  status: {
+    type: Number
+  },
+  createdBy: {
+    type: mongoose.Types.ObjectId
   }
 });
 

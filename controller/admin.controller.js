@@ -243,7 +243,19 @@ exports.updateStore = async (req, res) => {
 
 exports.getAllStores = async (req, res) => {
   await storeModel
-    .find({})
+    .aggregate([
+      {
+        $match: {}
+      },
+      {
+        $lookup: {
+          from: "admins",
+          foreignField: "_id",
+          localField: "createdBy",
+          as: "actionBy"
+        }
+      }
+    ])
     .then(async (success) => {
       return res.json({
         status: true,
@@ -362,6 +374,14 @@ exports.getRechargeHistory = async (req, res) => {
           as: "users",
         },
       },
+      {
+        $lookup: {
+          from: "admins",
+          foreignField: "_id",
+          localField: "createdBy",
+          as: "actionBy"
+        }
+      }
     ])
     .then((success) => {
       return res.json({
@@ -415,7 +435,7 @@ exports.addLevel = async (req, res) => {
 };
 
 exports.addSticker = async (req, res) => {
-  const { title } = req.body;
+  const { title, createdBy } = req.body;
 
   console.log(req.file);
   if (!req.file)
@@ -430,6 +450,7 @@ exports.addSticker = async (req, res) => {
     title: title,
     url: displayPhoto,
     status: 1,
+    createdBy: createdBy
   })
     .save()
     .then(async (success) => {
@@ -450,7 +471,19 @@ exports.addSticker = async (req, res) => {
 
 exports.getAllSticker = async (req, res) => {
   await stickerModel
-    .find({})
+    .aggregate([
+      {
+        $match: {}
+      },
+      {
+        $lookup: {
+          from: "admins",
+          foreignField: "_id",
+          localField: "createdBy",
+          as: "actionBy"
+        }
+      }
+    ])
     .then(async (success) => {
       return res.json({
         status: true,
@@ -592,7 +625,19 @@ exports.deleteLevelMaster = async (req, res) => {
 };
 
 exports.getAllLevel = async (req, res) => {
-  await levelMasterModel.find()
+  await levelMasterModel.aggregate([
+    {
+      $match: {}
+    },
+    {
+      $lookup: {
+        from: "admins",
+        foreignField: "_id",
+        localField: "createdBy",
+        as: "actionBy"
+      }
+    }
+  ])
     .then(async (success) => {
       return res.json({
         status: true,
@@ -610,10 +655,11 @@ exports.getAllLevel = async (req, res) => {
 }
 
 exports.addAd = async (req, res) => {
-  const { url } = req.body;
+  const { url, createdBy } = req.body;
 
   await new adModel({
     url: url,
+    createdBy: createdBy
   })
     .save()
     .then(async (success) => {
@@ -663,7 +709,19 @@ exports.getAds = async (req, res) => {
 
   console.log(typeof status);
   await adModel
-    .find({ status: status })
+    .aggregate([
+      {
+        $match: {}
+      },
+      {
+        $lookup: {
+          from: "admins",
+          foreignField: "_id",
+          localField: "createdBy",
+          as: "actionBy"
+        }
+      }
+    ])
     .then(async (success) => {
       return res.json({
         status: true,
@@ -752,7 +810,19 @@ exports.createGift = async (req, res) => {
 
 
 exports.getAllGifts = async (req, res) => {
-  await gift.find()
+  await gift.aggregate([
+    {
+      $match: {}
+    },
+    {
+      $lookup: {
+        from: "admins",
+        foreignField: "_id",
+        localField: "createdBy",
+        as: "actionBy"
+      }
+    }
+  ])
     .then(success => {
       return res.json({
         status: true,
@@ -817,6 +887,7 @@ exports.deleteGift = async (req, res) => {
 
 const salary = require("../model/salary.model");
 const bannedUserModel = require("../model/bannedUsers.model");
+const salaryHistory_Model = require("../model/salaryHistory.model");
 
 exports.createSalary = async (req, res) => {
   const { userId, coins } = req.body;
@@ -882,7 +953,19 @@ exports.createBanner = async (req, res) => {
 };
 
 exports.getAllBanners = async (req, res) => {
-  await Banner.find()
+  await Banner.aggregate([
+    {
+      $match:{}
+    },
+    {
+      $lookup: {
+        from: "admins",
+        foreignField: "_id",
+        localField: "createdBy",
+        as: "actionBy"
+      }
+    }
+  ])
     .then(success => {
       return res.json({
         status: true,
@@ -998,5 +1081,94 @@ exports.unbanUser = async (req, res) => {
         status: false,
         message: "error"
       })
+    })
+}
+
+exports.clearUserSalary = async (req, res) => {
+  const { userId, salary, percent, createdBy } = req.body
+
+  const isUserFound = await userModel.findOne({
+    _id: mongoose.Types.ObjectId(userId),
+  });
+  if (!isUserFound) {
+    return res.json({
+      success: false,
+      message: "user not found",
+    });
+  }
+
+
+  const totalEarning = isUserFound.LiveEarningcoin
+  const coinRemaing = totalEarning - salary
+  console.log(coinRemaing)
+  if (totalEarning < salary) {
+    return res.json({
+      success: false,
+      message: "not enough coins",
+    });
+  }
+
+  await new salaryHistory_Model({
+    user_id: userId,
+    cleared_salary: salary,
+    percentage: percent,
+    createdBy: createdBy
+  })
+    .save()
+    .then(async (success) => {
+      await userModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(userId) },
+        {
+          $set: { LiveEarningcoin: coinRemaing }
+        })
+
+      return res.json({
+        success: true,
+        message: "salary Cleared.",
+      });
+    })
+    .catch(error => {
+      return res.json({
+        success: false,
+        message: "something went wrong", error,
+      });
+    })
+
+}
+
+
+exports.getSalaryHistory = async (req, res) => {
+  await salaryHistory_Model.aggregate([
+    {
+      $match: {}
+    },
+    {
+      $lookup: {
+        from: "users",
+        foreignField: "_id",
+        localField: "user_id",
+        as: "user_info"
+      }
+    },
+    {
+      $lookup: {
+        from: "admins",
+        foreignField: "_id",
+        localField: "createdBy",
+        as: "actionBy"
+      }
+    }
+  ])
+    .then(success => {
+      return res.json({
+        success: true,
+        message: "salary history",
+        data: success
+      });
+    })
+    .catch(error => {
+      return res.json({
+        success: false,
+        message: "something went wrong", error,
+      });
     })
 }
