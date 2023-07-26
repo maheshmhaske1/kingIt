@@ -955,7 +955,7 @@ exports.createBanner = async (req, res) => {
 exports.getAllBanners = async (req, res) => {
   await Banner.aggregate([
     {
-      $match:{}
+      $match: {}
     },
     {
       $lookup: {

@@ -4,6 +4,7 @@ const live = require("../controller/live.controller");
 
 router.post("/add", live.goLive); //
 router.get("/get", live.getLives);
+router.get("/getbycountry/:country", live.getLiveByCountry);
 router.get('/get/:liveId', live.getLiveById)
 router.post("/block/user", live.addUserInBlockList);
 router.delete("/end/:liveId", live.endLive);

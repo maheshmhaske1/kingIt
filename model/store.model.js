@@ -16,10 +16,10 @@ const storeSchema = new mongoose.Schema({
   },
   status: {
     type: Number,
-    default:1
+    default: 1
   },
-  createdBy:{
-type:mongoose.Types.ObjectId
+  createdBy: {
+    type: mongoose.Types.ObjectId
   }
 });
 

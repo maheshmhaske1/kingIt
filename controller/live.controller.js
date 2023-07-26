@@ -60,6 +60,45 @@ exports.getLives = async (req, res) => {
     });
 };
 
+exports.getLiveByCountry = async (req, res) => {
+  const { country } = req.params
+  await liveModel
+    .aggregate([
+      {
+        $match: { isEnded: false },
+      },
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "userId",
+          as: "user",
+        },
+      },
+    ])
+    .then((success) => {
+      let countryUsers = []
+      success.map(success => {
+        if (success.user.length > 0)
+          if (success.user[0].country == country) {
+            countryUsers.push(success)
+          }
+      })
+      return res.json({
+        status: true,
+        message: "Live details",
+        data: countryUsers,
+      });
+    })
+    .catch((error) => {
+      return res.json({
+        status: false,
+        message: "error",
+      });
+    });
+};
+
+
 exports.watchLive = async (req, res) => {
   const { userId, liveId, hostId } = req.body;
 
@@ -141,18 +180,18 @@ exports.liveUserUpdate = async (req, res) => {
       status: status
     }
   })
-  .then(success=>{
-    return res.json({
-      status:true,
-      message:"updated"
+    .then(success => {
+      return res.json({
+        status: true,
+        message: "updated"
+      })
     })
-  })
-  .catch(error=>{
-    return res.json({
-      status:false,
-      message:"updated"
+    .catch(error => {
+      return res.json({
+        status: false,
+        message: "updated"
+      })
     })
-  })
 }
 
 exports.addUserInBlockList = async (req, res) => {
