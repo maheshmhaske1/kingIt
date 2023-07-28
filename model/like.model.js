@@ -7,6 +7,9 @@ const likeSchema = new mongoose.Schema({
     postId: {
         type: mongoose.Types.ObjectId
     }
+},
+{
+    timestamps: true
 })
 
 

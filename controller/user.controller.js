@@ -14,6 +14,7 @@ const storeModel = require("../model/store.model");
 const userStoreModel = require("../model/userStore.model");
 const bannedDeviceModel = require("../model/bannedDevice.model");
 const bannedUserModel = require("../model/bannedUsers.model");
+const userFollowingModel = require('../model/followers.model')
 
 exports.createUser = async (req, res) => {
   let { name, email, mobile, about, dob, gender, country } = req.body;
@@ -945,6 +946,254 @@ exports.getAllPost = async (req, res) => {
       });
     });
 };
+
+exports.getLatestPost = async (req, res) => {
+  try {
+    const tenDaysAgo = new Date();
+    tenDaysAgo.setDate(tenDaysAgo.getDate() - 10);
+
+    const posts = await PostModel.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: tenDaysAgo }, // Filter posts posted in the last 10 days
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          foreignField: '_id',
+          localField: 'userId',
+          as: 'userDetails',
+        },
+      },
+      {
+        $lookup: {
+          from: 'comments',
+          let: { postId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ['$postId', '$$postId'] },
+              },
+            },
+            {
+              $lookup: {
+                from: 'users',
+                foreignField: '_id',
+                localField: 'userId',
+                as: 'user_data',
+              },
+            },
+            {
+              $unwind: '$user_data',
+            },
+          ],
+          as: 'comments',
+        },
+      },
+      {
+        $lookup: {
+          from: 'likes',
+          foreignField: 'postId',
+          localField: '_id',
+          as: 'likes',
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          foreignField: '_id',
+          localField: 'likes.userId',
+          as: 'likes.user_data',
+        },
+      },
+      {
+        $unwind: {
+          path: '$likes.user_data',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+    ]);
+
+    return res.json({
+      status: true,
+      message: 'User post details',
+      data: posts,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.json({
+      status: false,
+      message: 'Error',
+      error,
+    });
+  }
+};
+
+exports.getPopularPost = async (req, res) => {
+  await postModel.aggregate([
+    {
+      $lookup: {
+        from: 'likes',
+        localField: '_id',
+        foreignField: 'postId',
+        as: 'likes',
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'userId',
+        foreignField: '_id',
+        as: 'users',
+      },
+    },
+    {
+      $lookup: {
+        from: "comments",
+        let: { postId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$postId", "$$postId"] },
+            },
+          },
+          {
+            $lookup: {
+              from: "users",
+              foreignField: "_id",
+              localField: "userId",
+              as: "user_data",
+            },
+          },
+          {
+            $unwind: "$user_data",
+          },
+        ],
+        as: "comments",
+      },
+    },
+    {
+      $addFields: {
+        likeCount: { $size: '$likes' },
+      },
+    },
+    {
+      $match: {
+        likeCount: { $gt: 10 },
+      },
+    },
+  ])
+    .then(async (success) => {
+      console.log(success);
+      return res.json({
+        status: true,
+        message: `popular posts`,
+        data: success,
+      });
+    })
+    .catch((error) => {
+      return res.json({
+        status: false,
+        message: `error`,
+        error,
+      });
+    });
+};
+
+exports.getFollowingPost = async (req, res) => {
+  const { userId } = req.params
+
+  const userFollowing = await userFollowingModel.find({
+    following_from: mongoose.Types.ObjectId(userId)
+  })
+
+  const searchPost = []
+  if (userFollowing) {
+    userFollowing.map(user => {
+      searchPost.push(user.following_to)
+    })
+  }
+  await postModel
+    .aggregate([
+      {
+        $match: {
+          userId: { $in: searchPost },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "userId",
+          as: "userDetails",
+        },
+      },
+      {
+        $lookup: {
+          from: "comments",
+          let: { postId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$postId", "$$postId"] },
+              },
+            },
+            {
+              $lookup: {
+                from: "users",
+                foreignField: "_id",
+                localField: "userId",
+                as: "user_data",
+              },
+            },
+            {
+              $unwind: "$user_data",
+            },
+          ],
+          as: "comments",
+        },
+      },
+      {
+        $lookup: {
+          from: "likes",
+          foreignField: "postId",
+          localField: "_id",
+          as: "likes",
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "likes.userId",
+          as: "likes.user_data",
+        },
+      },
+      {
+        $unwind: {
+          path: "$likes.user_data",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+    ])
+    .then(async (success) => {
+      console.log(success);
+      return res.json({
+        status: true,
+        message: `user post details`,
+        data: success,
+      });
+    })
+    .catch((error) => {
+      return res.json({
+        status: false,
+        message: `error`,
+        error,
+      });
+    });
+};
+
 
 exports.deletePost = async (req, res) => {
   const { postId } = req.params;

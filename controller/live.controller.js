@@ -373,7 +373,7 @@ exports.updateLiveJoinRequest = async (req, res) => {
         message: "error",
       });
     });
-};
+}
 
 exports.getPendingRequests = async (req, res) => {
   const { liveId } = req.params;
@@ -839,3 +839,29 @@ exports.removekickUser = async (req, res) => {
   }
 };
 
+exports.test = async(req,res)=>{
+  liveModel.aggregate([
+    {
+      $lookup:{
+        from:"users",
+        foreignField:"_id",
+        localField:"userId",
+        as:"users"
+      }
+    }
+  ])
+   .then((success) => {
+      return res.json({
+        status: true,
+        message: "live earning history",
+        data: success,
+      });
+    })
+    .catch((error) => {
+      return res.json({
+        status: false,
+        message: "eror",
+      });
+    });
+
+}

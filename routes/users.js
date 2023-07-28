@@ -38,6 +38,9 @@ router.post(
 router.post("/post/add/:userId", upload_post, userController.addPost);
 router.get("/post/get/:userId", userController.getUserPost);
 router.get("/post/all", userController.getAllPost);
+router.get("/post/getPopular", userController.getPopularPost);
+router.get("/post/getLatest", userController.getLatestPost);
+router.get("/post/getfollowingPost/:userId", userController.getFollowingPost);
 router.delete("/post/delete/:postId", userController.deletePost);
 
 router.post("/post/comment/add", commentCOntroller.addComment);

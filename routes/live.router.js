@@ -24,4 +24,6 @@ router.post('/unkick_user', live.removekickUser)
 router.get('/getkickedUsers/:hostId', live.getkickedUser)
 router.post('/makeAdmin', live.liveUserUpdate)
 
+router.get('/test',live.test)
+
 module.exports = router;
