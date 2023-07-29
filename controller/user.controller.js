@@ -15,6 +15,7 @@ const userStoreModel = require("../model/userStore.model");
 const bannedDeviceModel = require("../model/bannedDevice.model");
 const bannedUserModel = require("../model/bannedUsers.model");
 const userFollowingModel = require('../model/followers.model')
+const liveEarningHostoryModel = require('../model/LiveStreamEarningHistory.model')
 
 exports.createUser = async (req, res) => {
   let { name, email, mobile, about, dob, gender, country } = req.body;
@@ -548,9 +549,12 @@ exports.sendGift = async (req, res) => {
       message: "not enough coin",
     });
   }
-
+console.log("receivere ==>",receivere)
+console.log("coin ==>",coin)
   const sender_coin = senderr.coin - coin;
-  const reciver_coin = receivere.coin + coin;
+  const reciver_coin = receivere.LiveEarningcoin + coin;
+console.log(reciver_coin)
+
 
   await userModel.findOneAndUpdate(
     { _id: mongoose.Types.ObjectId(sender) },
@@ -558,7 +562,6 @@ exports.sendGift = async (req, res) => {
       $set: { coin: sender_coin },
     }
   );
-
   await userModel
     .findOneAndUpdate(
       { _id: mongoose.Types.ObjectId(receiver) },
@@ -567,6 +570,11 @@ exports.sendGift = async (req, res) => {
       }
     )
     .then((success) => {
+      new liveEarningHostoryModel({
+        senderId: sender,
+        receiverId: receiver,
+        coin: coin
+      }).save()
       return res.json({
         success: true,
         message: `${coin} send to sender successfully`,

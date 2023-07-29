@@ -839,18 +839,18 @@ exports.removekickUser = async (req, res) => {
   }
 };
 
-exports.test = async(req,res)=>{
+exports.test = async (req, res) => {
   liveModel.aggregate([
     {
-      $lookup:{
-        from:"users",
-        foreignField:"_id",
-        localField:"userId",
-        as:"users"
+      $lookup: {
+        from: "users",
+        foreignField: "_id",
+        localField: "userId",
+        as: "users"
       }
     }
   ])
-   .then((success) => {
+    .then((success) => {
       return res.json({
         status: true,
         message: "live earning history",
@@ -865,3 +865,79 @@ exports.test = async(req,res)=>{
     });
 
 }
+
+exports.getTopSender = async (req, res) => {
+  try {
+    const combinedData = await liveearningModel.aggregate([
+      {
+        $group: {
+          _id: "$senderId",
+          totalCoin: { $sum: "$coin" },
+        },
+      },
+      {
+        $sort: { totalCoin: -1 } 
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id", 
+          foreignField: "_id", 
+          as: "user_info", 
+        },
+      },
+      {
+        $project: {
+          _id: 0, 
+          totalCoin: 1, 
+          user_info: {
+            $arrayElemAt: ["$user_info", 0],
+          },
+        },
+      },
+    ]);
+
+    res.status(200).json(combinedData);
+  } catch (err) {
+    console.error("Error in aggregation: ", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+exports.getTopReciver = async (req, res) => {
+  try {
+    const combinedData = await liveearningModel.aggregate([
+      {
+        $group: {
+          _id: "$receiverId",
+          totalCoin: { $sum: "$coin" },
+        },
+      },
+      {
+        $sort: { totalCoin: -1 } 
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id", 
+          foreignField: "_id", 
+          as: "user_info", 
+        },
+      },
+      {
+        $project: {
+          _id: 0, 
+          totalCoin: 1, 
+          user_info: {
+            $arrayElemAt: ["$user_info", 0],
+          },
+        },
+      },
+    ]);
+
+    res.status(200).json(combinedData);
+  } catch (err) {
+    console.error("Error in aggregation: ", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
