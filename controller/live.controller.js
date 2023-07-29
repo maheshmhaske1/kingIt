@@ -941,3 +941,32 @@ exports.getTopReciver = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+exports.getGiftSendHistory = async (req, res) => {
+  try {
+    const combinedData = await liveearningModel.aggregate([
+      {
+        $lookup: {
+          from: "users",
+          localField: "senderId", 
+          foreignField: "_id", 
+          as: "sender_user_info", 
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "receiverId", 
+          foreignField: "_id", 
+          as: "reciver_user_info", 
+        },
+      },
+    ]);
+
+    res.status(200).json(combinedData);
+  } catch (err) {
+    console.error("Error in aggregation: ", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+

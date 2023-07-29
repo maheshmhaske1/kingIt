@@ -25,6 +25,7 @@ router.get('/getkickedUsers/:hostId', live.getkickedUser)
 router.post('/makeAdmin', live.liveUserUpdate)
 router.get('/getTopSender',live.getTopSender)
 router.get('/getTopReciver',live.getTopReciver)
+router.get('/gettopsendrecive',live.getGiftSendHistory)
 
 router.get('/test',live.test)
 
