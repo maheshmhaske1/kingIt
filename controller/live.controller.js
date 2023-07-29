@@ -876,20 +876,20 @@ exports.getTopSender = async (req, res) => {
         },
       },
       {
-        $sort: { totalCoin: -1 } 
+        $sort: { totalCoin: -1 }
       },
       {
         $lookup: {
           from: "users",
-          localField: "_id", 
-          foreignField: "_id", 
-          as: "user_info", 
+          localField: "_id",
+          foreignField: "_id",
+          as: "user_info",
         },
       },
       {
         $project: {
-          _id: 0, 
-          totalCoin: 1, 
+          _id: 0,
+          totalCoin: 1,
           user_info: {
             $arrayElemAt: ["$user_info", 0],
           },
@@ -914,20 +914,20 @@ exports.getTopReciver = async (req, res) => {
         },
       },
       {
-        $sort: { totalCoin: -1 } 
+        $sort: { totalCoin: -1 }
       },
       {
         $lookup: {
           from: "users",
-          localField: "_id", 
-          foreignField: "_id", 
-          as: "user_info", 
+          localField: "_id",
+          foreignField: "_id",
+          as: "user_info",
         },
       },
       {
         $project: {
-          _id: 0, 
-          totalCoin: 1, 
+          _id: 0,
+          totalCoin: 1,
           user_info: {
             $arrayElemAt: ["$user_info", 0],
           },
@@ -948,17 +948,17 @@ exports.getGiftSendHistory = async (req, res) => {
       {
         $lookup: {
           from: "users",
-          localField: "senderId", 
-          foreignField: "_id", 
-          as: "sender_user_info", 
+          localField: "senderId",
+          foreignField: "_id",
+          as: "sender_user_info",
         },
       },
       {
         $lookup: {
           from: "users",
-          localField: "receiverId", 
-          foreignField: "_id", 
-          as: "reciver_user_info", 
+          localField: "receiverId",
+          foreignField: "_id",
+          as: "reciver_user_info",
         },
       },
     ]);
@@ -970,3 +970,91 @@ exports.getGiftSendHistory = async (req, res) => {
   }
 };
 
+
+exports.getTopSenderByCountry = async (req, res) => {
+  try {
+    const { country } = req.params
+    const combinedData = await liveearningModel.aggregate([
+      {
+        $group: {
+          _id: "$senderId",
+          totalCoin: { $sum: "$coin" },
+        },
+      },
+      {
+        $sort: { totalCoin: -1 }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "user_info",
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalCoin: 1,
+          user_info: {
+            $arrayElemAt: ["$user_info", 0],
+          },
+        },
+      },
+    ]);
+    let countryUsers = []
+    combinedData.map(combinedData => {
+      if (combinedData.user_info.country === country) {
+        countryUsers.push(combinedData)
+      }
+    })
+    res.status(200).json(countryUsers);
+  } catch (err) {
+    console.error("Error in aggregation: ", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+exports.getTopReciverByCountry = async (req, res) => {
+  try {
+    const { country } = req.params
+    const combinedData = await liveearningModel.aggregate([
+      {
+        $group: {
+          _id: "$receiverId",
+          totalCoin: { $sum: "$coin" },
+        },
+      },
+      {
+        $sort: { totalCoin: -1 }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "user_info",
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalCoin: 1,
+          user_info: {
+            $arrayElemAt: ["$user_info", 0],
+          },
+        },
+      },
+    ]);
+    let countryUsers = []
+    combinedData.map(combinedData => {
+      if (combinedData.user_info.country === country) {
+        countryUsers.push(combinedData)
+      }
+    })
+    res.status(200).json(countryUsers);
+  } catch (err) {
+    console.error("Error in aggregation: ", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};

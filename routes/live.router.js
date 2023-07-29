@@ -23,10 +23,12 @@ router.post('/kick_user', live.kickUser)
 router.post('/unkick_user', live.removekickUser)
 router.get('/getkickedUsers/:hostId', live.getkickedUser)
 router.post('/makeAdmin', live.liveUserUpdate)
-router.get('/getTopSender',live.getTopSender)
-router.get('/getTopReciver',live.getTopReciver)
-router.get('/gettopsendrecive',live.getGiftSendHistory)
+router.get('/getTopSender', live.getTopSender)
+router.get('/getTopSenderByCountry/:country', live.getTopSenderByCountry)
+router.get('/getTopReciverByCountry/:country', live.getTopReciverByCountry)
+router.get('/getTopReciver', live.getTopReciver)
+router.get('/gettopsendrecive', live.getGiftSendHistory)
 
-router.get('/test',live.test)
+router.get('/test', live.test)
 
 module.exports = router;
