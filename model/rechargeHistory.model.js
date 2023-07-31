@@ -10,6 +10,9 @@ const rechargeHistorySchema = new mongoose.Schema({
   createdBy: {
     type: mongoose.Types.ObjectId,
   },
+},
+{
+  timestamps: true,
 });
 
 var rechargeHistoryModel = mongoose.model(
