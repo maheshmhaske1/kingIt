@@ -241,6 +241,33 @@ exports.updateStore = async (req, res) => {
     });
 };
 
+exports.deleteStore = async (req, res) => {
+  const { storeId } = req.body
+
+  if (!storeId) {
+    return res.json({
+      status: false,
+      message: "please provide valid storeId"
+    })
+  }
+
+  await storeModel.findOneAndDelete({ _id: mongoose.Types.ObjectId(storeId) })
+    .then(async (success) => {
+      return res.json({
+        status: true,
+        message: `store deleted successfully`,
+        data: success,
+      });
+    })
+    .catch((error) => {
+      return res.json({
+        status: false,
+        message: `error`,
+        error,
+      });
+    });
+}
+
 exports.getAllStores = async (req, res) => {
   await storeModel
     .aggregate([
@@ -531,6 +558,33 @@ exports.updateSticker = async (req, res) => {
       });
     });
 };
+
+exports.deleteSticker = async (req, res) => {
+  const { stickerId } = req.body
+
+  if (!stickerId) {
+    return res.json({
+      status: false,
+      message: "please provide sticke id"
+    })
+  }
+
+  await stickerModel.findOneAndDelete({ _id: mongoose.Types.ObjectId(stickerId) })
+    .then(async (success) => {
+      return res.json({
+        status: true,
+        message: `sticker deleted successfully`,
+        data: success,
+      });
+    })
+    .catch((error) => {
+      return res.json({
+        status: false,
+        message: `error`,
+        error,
+      });
+    });
+}
 
 exports.addLevelMaster = async (req, res) => {
   const { coinRequire, createdBy } = req.body;

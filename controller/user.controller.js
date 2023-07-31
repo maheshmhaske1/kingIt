@@ -20,7 +20,7 @@ const liveEarningHostoryModel = require('../model/LiveStreamEarningHistory.model
 exports.createUser = async (req, res) => {
   let { name, email, mobile, about, dob, gender, country } = req.body;
 
-  const isUserFound = await userModel.findOne({ email: email });
+  const isUserFound = await userModel.findOne({ email: email, mobile: mobile });
   if (isUserFound) {
     return res.json({
       success: false,
@@ -549,11 +549,11 @@ exports.sendGift = async (req, res) => {
       message: "not enough coin",
     });
   }
-console.log("receivere ==>",receivere)
-console.log("coin ==>",coin)
+  console.log("receivere ==>", receivere)
+  console.log("coin ==>", coin)
   const sender_coin = senderr.coin - coin;
   const reciver_coin = receivere.LiveEarningcoin + coin;
-console.log(reciver_coin)
+  console.log(reciver_coin)
 
 
   await userModel.findOneAndUpdate(
