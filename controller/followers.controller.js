@@ -97,6 +97,7 @@ exports.get_user_followers = async (req, res) => {
           "follower_details._id": 1,
           "follower_details.name": 1,
           "follower_details.photo": 1,
+          "follower_details.country":1
         },
       },
     ])
@@ -145,6 +146,7 @@ exports.get_user_following = async (req, res) => {
           "following_details._id": 1,
           "following_details.name": 1,
           "following_details.photo": 1,
+          "follower_details.country":1
         },
       },
     ])

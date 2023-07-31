@@ -14,14 +14,14 @@ const userStoreSchema = new mongoose.Schema({
   validTill: {
     type: Date,
   },
-  
+
   createdBy: {
     type: mongoose.Types.ObjectId,
   },
 },
-{
-  timestamps: true,
-});
+  {
+    timestamps: true,
+  });
 
 var userStoreModel = mongoose.model("userStoreItems", userStoreSchema);
 module.exports = userStoreModel;
