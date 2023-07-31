@@ -24,6 +24,9 @@ const liveSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+},
+{
+  timestamps: true,
 });
 
 var liveModel = mongoose.model("lives", liveSchema);

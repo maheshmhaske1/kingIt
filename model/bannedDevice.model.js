@@ -5,6 +5,9 @@ const bannedDeviceSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+},
+{
+  timestamps: true,
 });
 
 var bannedDeviceModel = mongoose.model("bannedDevise", bannedDeviceSchema);

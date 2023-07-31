@@ -11,6 +11,9 @@ const liveEarningHostorySchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
   },
   coin: { type: Number },
+},
+{
+  timestamps: true,
 });
 
 var liveearningModel = mongoose.model(

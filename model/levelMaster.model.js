@@ -10,6 +10,9 @@ const levelMasterSchema = new mongoose.Schema({
     createdBy: {
         type: mongoose.Types.ObjectId,
       },
+},
+{
+    timestamps: true,
 });
 
 var levelMasterModel = mongoose.model("levelMaster", levelMasterSchema);

@@ -19,6 +19,9 @@ const giftSchema = new mongoose.Schema({
   createdBy: {
     type: mongoose.Types.ObjectId,
   },
+},
+{
+  timestamps: true,
 });
 
 const Gift = mongoose.model('Gifts', giftSchema);

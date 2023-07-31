@@ -9,6 +9,9 @@ const salarySchema = new mongoose.Schema({
     type: Number,
 
   },
+},
+{
+  timestamps: true,
 });
 
 const Salary = mongoose.model('Salary', salarySchema);

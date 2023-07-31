@@ -11,6 +11,9 @@ const liveJoinedSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   }
+},
+{
+  timestamps: true,
 });
 
 var liveJoinedModel = mongoose.model("live_joined", liveJoinedSchema);

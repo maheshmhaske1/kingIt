@@ -11,6 +11,9 @@ const commentsSchema = new mongoose.Schema({
         type: String,
         default: ''
     }
+},
+{
+    timestamps: true,
 })
 
 

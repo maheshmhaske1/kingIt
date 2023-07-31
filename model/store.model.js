@@ -21,6 +21,9 @@ const storeSchema = new mongoose.Schema({
   createdBy: {
     type: mongoose.Types.ObjectId
   }
+},
+{
+  timestamps: true,
 });
 
 var storeModel = mongoose.model("storeItems", storeSchema);

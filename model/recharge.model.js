@@ -39,6 +39,9 @@ const rechargeSchema = new mongoose.Schema({
   createdBy: {
     type: mongoose.Types.ObjectId,
   },
+},
+{
+  timestamps: true,
 });
 
 const Recharge = mongoose.model('Recharge', rechargeSchema);

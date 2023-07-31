@@ -12,6 +12,9 @@ const adSchema = new mongoose.Schema({
   createdBy:{
     type:mongoose.Types.ObjectId
   }
+},
+{
+  timestamps: true,
 });
 
 var adModel = mongoose.model("ads", adSchema);

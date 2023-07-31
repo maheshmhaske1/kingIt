@@ -16,6 +16,9 @@ const userSupportSchema = new mongoose.Schema({
         type: String,
         default: ''
     }
+},
+{
+    timestamps: true,
 })
 
 

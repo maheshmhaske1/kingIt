@@ -11,6 +11,9 @@ const requestedUsersLivechema = new mongoose.Schema({
     type: Number,
     default: 0, //0.pending 1.accepted 2.rejected
   },
+},
+{
+  timestamps: true,
 });
 
 var requestedUsersLiveModel = mongoose.model(

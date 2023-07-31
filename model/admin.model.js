@@ -15,6 +15,9 @@ const adminSchema = new mongoose.Schema({
   Permissions:{
     type:String
   }
+},
+{
+  timestamps: true,
 });
 
 var adminModel = mongoose.model("admin", adminSchema);
