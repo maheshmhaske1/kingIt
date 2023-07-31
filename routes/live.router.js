@@ -17,6 +17,7 @@ router.get("/get-accepted-request/:liveId", live.getAcceptedRequests); //
 router.post("/kick-user", live.kickFromLive); //
 router.post("/send-coin", live.sendCoin); //
 router.get('/live-all-earning-history', live.getLiveEarningHistory)
+router.post('/live-all-earning-history-byUser', live.getLiveEarningHistoryByUser)
 router.get('/live-earning-history/:liveId', live.getLiveEarningHistorybylive)
 router.post('/mute_user', live.muteUser)
 router.post('/kick_user', live.kickUser)

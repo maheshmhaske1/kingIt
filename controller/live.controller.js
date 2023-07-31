@@ -681,6 +681,64 @@ exports.getLiveEarningHistory = async (req, res) => {
     });
 };
 
+exports.getLiveEarningHistoryByUser = async (req, res) => {
+  const { userId, status } = req.body
+  //1.sending 2.receiving
+  let query = {}
+  if (status == 1) {
+    query = { senderId: mongoose.Types.ObjectId(userId) }
+  }
+  else if (status == 2) {
+    query = { receiverId: mongoose.Types.ObjectId(userId) }
+  }
+  else {
+    query = {}
+  }
+  liveearningModel
+    .aggregate([
+      {
+        $match: query
+      },
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "senderId",
+          as: "sender",
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "receiverId",
+          as: "receiver",
+        },
+      },
+      {
+        $lookup: {
+          from: "lives",
+          foreignField: "_id",
+          localField: "liveId",
+          as: "live",
+        },
+      },
+    ])
+    .then((success) => {
+      return res.json({
+        status: true,
+        message: "live earning history",
+        data: success,
+      });
+    })
+    .catch((error) => {
+      return res.json({
+        status: false,
+        message: "eror",
+      });
+    });
+};
+
 exports.getLiveEarningHistorybylive = async (req, res) => {
   liveearningModel
     .aggregate([
