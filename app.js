@@ -16,7 +16,7 @@ var live = require("./routes/live.router");
 var admin = require("./routes/admin.router");
 var notification = require('./routes/notification.router')
 var liveComments = require('./routes/liveComments.router')
-const gift=require('./routes/gift.router')
+const gift = require('./routes/gift.router')
 
 var app = express();
 db.dbConnection();
@@ -55,12 +55,10 @@ app.use(function (req, res, next) {
 });
 
 // =============== IMAGES STATIC PATHS =============== //
-app.use(
-  "/profile_images",
-  express.static(path.join(__dirname, "public/profile_images"))
-); // PROFILE IMAGES
+app.use("/profile_images", express.static(path.join(__dirname, "public/profile_images"))); // PROFILE IMAGES
 app.use("/posts", express.static(path.join(__dirname, "public/posts"))); // PROFILE IMAGES
-app.use("/stores", express.static(path.join(__dirname, "public/store"))); // PROFILE IMAGES
+app.use("/stores", express.static(path.join(__dirname, "public/stores")));
+
 
 // error handler
 app.use(function (err, req, res, next) {
