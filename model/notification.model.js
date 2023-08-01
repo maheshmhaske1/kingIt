@@ -5,6 +5,10 @@ const notificationSchema = new mongoose.Schema({
         type: mongoose.Types.ObjectId,
         default: ''
     },
+    from: {
+        type: mongoose.Types.ObjectId,
+        default: ''
+    },
     title: {
         type: String,
         default: ''

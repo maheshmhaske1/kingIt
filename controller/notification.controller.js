@@ -3,7 +3,7 @@ const notificationModel = require('../model/notification.model')
 const userModel = require('../model/user.model')
 
 exports.createNotification = async (req, res) => {
-    const { to, title, body } = req.body
+    const { to, from, title, body } = req.body
 
     if (!to || !title || !body) {
         return res.json({
@@ -23,6 +23,7 @@ exports.createNotification = async (req, res) => {
 
     await new notificationModel({
         to: to,
+        from: from,
         title: title,
         body: body,
         isRead: false
@@ -77,8 +78,10 @@ exports.getNotification = async (req, res) => {
     else if (key == 1) {
         message = `All unread Notifications`
         query = {
-            userId: mongoose.Types.ObjectId(userId),
-            isRead: false
+            $or: [
+                { to: mongoose.Types.ObjectId(userId) },
+                { from: mongoose.Types.ObjectId(userId) },
+              ]
         }
     }
     else if (key == 2) {
