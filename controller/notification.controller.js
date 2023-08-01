@@ -190,7 +190,7 @@ exports.markAllNotificationAsRead = async (req, res) => {
     }
 
 
-    await notificationModel.findOneAndUpdate(
+    await notificationModel.updateMany(
         { to: mongoose.Types.ObjectId(userId) },
         {
             $set: { isRead: true }
