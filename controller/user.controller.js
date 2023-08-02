@@ -955,6 +955,108 @@ exports.getAllPost = async (req, res) => {
     });
 };
 
+// exports.getAllPost = async (req, res) => {};
+exports.getPopularPost = async (req, res) => {
+  await postModel
+    .aggregate([
+      {
+        $match: {},
+      },
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "userId",
+          as: "userDetails",
+        },
+      },
+      {
+        $lookup: {
+          from: "comments",
+          let: { postId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$postId", "$$postId"] },
+              },
+            },
+            {
+              $lookup: {
+                from: "users",
+                foreignField: "_id",
+                localField: "userId",
+                as: "user_data",
+              },
+            },
+            {
+              $unwind: "$user_data",
+            },
+          ],
+          as: "comments",
+        },
+      },
+      {
+        $lookup: {
+          from: "likes",
+          foreignField: "postId",
+          localField: "_id",
+          as: "likes",
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "likes.userId",
+          as: "likes.user_data",
+        },
+      },
+      {
+        $unwind: {
+          path: "$likes.user_data",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+    ])
+    .then(async (success) => {
+      let data = success
+      const sortPostsByLikesComments = (postA, postB) => {
+        const likesA = postA.likes.length;
+        const commentsA = postA.comments.length;
+        const likesB = postB.likes.length;
+        const commentsB = postB.comments.length;
+
+        if (likesA > likesB) {
+          return -1;
+        } else if (likesA < likesB) {
+          return 1;
+        }
+
+        if (commentsA > commentsB) {
+          return -1;
+        } else if (commentsA < commentsB) {
+          return 1;
+        }
+        return 0;
+      };
+
+      const sortedData = await data.sort(sortPostsByLikesComments);
+
+      return res.json({
+        status: true,
+        message: `user post details`,
+        data: sortedData,
+      });
+    })
+    .catch((error) => {
+      return res.json({
+        status: false,
+        message: `error`,
+        error,
+      });
+    });
+};
+
 exports.getLatestPost = async (req, res) => {
   try {
     const tenDaysAgo = new Date();
@@ -1038,76 +1140,6 @@ exports.getLatestPost = async (req, res) => {
   }
 };
 
-exports.getPopularPost = async (req, res) => {
-  await postModel.aggregate([
-    {
-      $lookup: {
-        from: 'likes',
-        localField: '_id',
-        foreignField: 'postId',
-        as: 'likes',
-      },
-    },
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'userId',
-        foreignField: '_id',
-        as: 'users',
-      },
-    },
-    {
-      $lookup: {
-        from: "comments",
-        let: { postId: "$_id" },
-        pipeline: [
-          {
-            $match: {
-              $expr: { $eq: ["$postId", "$$postId"] },
-            },
-          },
-          {
-            $lookup: {
-              from: "users",
-              foreignField: "_id",
-              localField: "userId",
-              as: "user_data",
-            },
-          },
-          {
-            $unwind: "$user_data",
-          },
-        ],
-        as: "comments",
-      },
-    },
-    {
-      $addFields: {
-        likeCount: { $size: '$likes' },
-      },
-    },
-    {
-      $match: {
-        likeCount: { $gt: 10 },
-      },
-    },
-  ])
-    .then(async (success) => {
-      console.log(success);
-      return res.json({
-        status: true,
-        message: `popular posts`,
-        data: success,
-      });
-    })
-    .catch((error) => {
-      return res.json({
-        status: false,
-        message: `error`,
-        error,
-      });
-    });
-};
 
 exports.getFollowingPost = async (req, res) => {
   const { userId } = req.params
